@@ -19,6 +19,7 @@ DATASETS = {
         "drop_cols": [0],  # 哪些列不能当作特征
         "label_col": 0,  # 那些列表示类别
         "anomaly": ["M"], #异常的值是什么
+        "normalize": True, #是否跳过归一化
 
     },
 
@@ -28,6 +29,7 @@ DATASETS = {
     #     "drop_cols": [],
     #     "label_col": 0,
     #     "anomaly": [1],
+    #     "normalize": True,
     # },
 
     #合成数据集
@@ -91,9 +93,8 @@ def load_dataset(name: str):
     X = X_df.to_numpy(dtype=float)
 
     #采用0，1范围的数据归一化
-    scaler = MinMaxScaler()
-    X = scaler.fit_transform(X)
-
+    if cfg.get("normalize", False):
+        X = MinMaxScaler().fit_transform(X)
     return X, y
 
 
