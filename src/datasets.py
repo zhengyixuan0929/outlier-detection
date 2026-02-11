@@ -23,14 +23,14 @@ DATASETS = {
 
     },
 
-    # "diabetes_binary": {
-    #     "path": DATA_DIR / "archive" / "diabetes_binary_health_indicators_BRFSS2015.csv",
-    #     "read_csv": {"header": 0},
-    #     "drop_cols": [],
-    #     "label_col": 0,
-    #     "anomaly": [1],
-    #     "normalize": True,
-    # },
+    "diabetes_binary": {
+        "path": DATA_DIR / "archive" / "diabetes_binary_health_indicators_BRFSS2015.csv",
+        "read_csv": {"header": 0},
+        "drop_cols": [],
+        "label_col": 0,
+        "anomaly": [1],
+        "normalize": True,
+    },
 
     #合成数据集
     "syn_gauss_uo": {
