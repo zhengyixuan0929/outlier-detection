@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from pathlib import Path
+from sklearn.preprocessing import MinMaxScaler
 from src.synthetic import (
     synth_gaussian_with_uniform_outliers,
     synth_two_density_clusters_with_outliers,
@@ -21,13 +22,13 @@ DATASETS = {
 
     },
 
-    "diabetes_binary": {
-        "path": DATA_DIR / "archive" / "diabetes_binary_health_indicators_BRFSS2015.csv",
-        "read_csv": {"header": 0},
-        "drop_cols": [],
-        "label_col": 0,
-        "anomaly": [1],
-    },
+    # "diabetes_binary": {
+    #     "path": DATA_DIR / "archive" / "diabetes_binary_health_indicators_BRFSS2015.csv",
+    #     "read_csv": {"header": 0},
+    #     "drop_cols": [],
+    #     "label_col": 0,
+    #     "anomaly": [1],
+    # },
 
     #合成数据集
     "syn_gauss_uo": {
@@ -86,8 +87,13 @@ def load_dataset(name: str):
             f"{name}: Non-numeric or missing values found after conversion. "
             f"Columns with NaN: {bad_cols} (check drop_cols/label_col)."
         )
-
+    #把 pandas DataFrame 转成 numpy 数组
     X = X_df.to_numpy(dtype=float)
+
+    #采用0，1范围的数据归一化
+    scaler = MinMaxScaler()
+    X = scaler.fit_transform(X)
+
     return X, y
 
 
