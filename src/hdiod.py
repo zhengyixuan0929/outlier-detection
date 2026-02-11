@@ -11,10 +11,8 @@ def _local_kernel_density(distances, sigma=None):
 
 
 def _high_density_peak(indices: np.ndarray, rho: np.ndarray) -> np.ndarray:
-    """
-    对每个点做高密度迭代：每次跳到邻居里 rho 最大的点，直到不再上升
-    返回：peak_index[i] = 迭代终点（峰值点）的样本索引
-    """
+
+    #对每个点做高密度迭代：每次跳到邻居里 rho 最大的点，直到不再上升返回：peak_index[i] = 迭代终点（峰值点）的样本索引
     n, k = indices.shape
     peak = np.zeros(n, dtype=int)
 

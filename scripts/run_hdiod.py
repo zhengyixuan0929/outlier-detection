@@ -19,9 +19,5 @@ def main():
 
     print("=" * 60)
 
-    auc = roc_auc_score(y, scores)
-    auc_flip = roc_auc_score(y, -scores)
-    print("AUC:", auc, " AUC(-score):", auc_flip)
-
 if __name__ == "__main__":
     main()

@@ -19,15 +19,41 @@ DATASETS = {
         "drop_cols": [0],  # 哪些列不能当作特征
         "label_col": 0,  # 那些列表示类别
         "anomaly": ["M"], #异常的值是什么
-        "normalize": True, #是否跳过归一化
-
+        "normalize": False, #是否跳过归一化
     },
 
-    "diabetes_binary": {
-        "path": DATA_DIR / "archive" / "diabetes_binary_health_indicators_BRFSS2015.csv",
+    # "diabetes_binary": {
+    #     "path": DATA_DIR / "archive" / "diabetes_binary_health_indicators_BRFSS2015.csv",
+    #     "read_csv": {"header": 0},
+    #     "drop_cols": [],
+    #     "label_col": 0,
+    #     "anomaly": [1],
+    #     "normalize": False,
+    # },
+
+    "heart_failure": {
+        "path": DATA_DIR / "heart+failure+clinical+records" / "heart_failure_clinical_records_dataset.csv",
         "read_csv": {"header": 0},
         "drop_cols": [],
-        "label_col": 0,
+        "label_col": -1,
+        "anomaly": [1],
+        "normalize": True,
+    },
+
+    "bupa": {
+        "path": DATA_DIR / "liver+disorders" / "bupa.csv",
+        "read_csv": {"header": None,"skiprows": 1},
+        "drop_cols": [],
+        "label_col": -1,
+        "anomaly": [1],
+        "normalize": False,
+    },
+
+    "Parkinsons": {
+        "path": DATA_DIR / "parkinsons" / "parkinsons.csv",
+        "read_csv": {"header": 0},
+        "drop_cols": [0],
+        "label_col": 16,
         "anomaly": [1],
         "normalize": True,
     },
@@ -78,7 +104,8 @@ def load_dataset(name: str):
 
     # 4) build X = all remaining numeric features
     X_df = df.drop(df.columns[label_col], axis=1)
-
+    # 自动处理类别变量
+    X_df = pd.get_dummies(X_df, drop_first=True)
     # 强制数值化：如果还有字符串，会变成 NaN（便于定位）
     X_df = X_df.apply(pd.to_numeric, errors="coerce")
 
@@ -95,6 +122,7 @@ def load_dataset(name: str):
     #采用0，1范围的数据归一化
     if cfg.get("normalize", False):
         X = MinMaxScaler().fit_transform(X)
+
     return X, y
 
 
