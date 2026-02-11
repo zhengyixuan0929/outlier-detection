@@ -1,10 +1,17 @@
+import numpy as np
 import pandas as pd
 from pathlib import Path
+from src.synthetic import (
+    synth_gaussian_with_uniform_outliers,
+    synth_two_density_clusters_with_outliers,
+    synth_moons_with_outliers
+)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "Data"
 
 DATASETS = {
+    #真实数据集
     "wdbc": {
         "path": DATA_DIR / "breast+cancer+wisconsin+diagnostic" / "wdbc.csv",
         "read_csv": {"header": None,"skiprows": 1},
@@ -22,7 +29,16 @@ DATASETS = {
         "anomaly": [1],
     },
 
-
+    #合成数据集
+    "syn_gauss_uo": {
+        "generator": lambda: synth_gaussian_with_uniform_outliers(n_normal=2000, contamination=0.05, random_state=42)
+    },
+    "syn_two_density": {
+        "generator": lambda: synth_two_density_clusters_with_outliers(n_normal=2000, contamination=0.05, random_state=42)
+    },
+    "syn_moons": {
+        "generator": lambda: synth_moons_with_outliers(n_normal=2000, contamination=0.05, random_state=42)
+    },
 }
 
 def load_dataset(name: str):
@@ -34,8 +50,14 @@ def load_dataset(name: str):
         raise ValueError(f"Unknown dataset: {name}. Available: {list(DATASETS.keys())}")
 
     cfg = DATASETS[name]
-    path = cfg["path"]
 
+    if "generator" in cfg:
+        X, y = cfg["generator"]()
+        X = np.asarray(X, dtype=float)
+        y = np.asarray(y, dtype=int)
+        return X, y
+
+    path = cfg["path"]
     # 1) read
     read_kwargs = cfg.get("read_csv", {})
     df = pd.read_csv(path, **read_kwargs)
