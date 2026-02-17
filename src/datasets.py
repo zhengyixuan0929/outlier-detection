@@ -22,15 +22,6 @@ DATASETS = {
         "normalize": False, #是否跳过归一化
     },
 
-    # "diabetes_binary": {
-    #     "path": DATA_DIR / "archive" / "diabetes_binary_health_indicators_BRFSS2015.csv",
-    #     "read_csv": {"header": 0},
-    #     "drop_cols": [],
-    #     "label_col": 0,
-    #     "anomaly": [1],
-    #     "normalize": False,
-    # },
-
     "heart_failure": {
         "path": DATA_DIR / "heart+failure+clinical+records" / "heart_failure_clinical_records_dataset.csv",
         "read_csv": {"header": 0},
@@ -58,16 +49,70 @@ DATASETS = {
         "normalize": True,
     },
 
-    #合成数据集
-    "syn_gauss_uo": {
-        "generator": lambda: synth_gaussian_with_uniform_outliers(n_normal=2000, contamination=0.05, random_state=42)
+    "Gallstone": {
+        "path": DATA_DIR / "Gallstone" / "dataset-uci.csv",
+        "read_csv": {"header": 0},
+        "drop_cols": [],
+        "label_col": 0,
+        "anomaly": [1],
+        "normalize": True,
     },
-    "syn_two_density": {
-        "generator": lambda: synth_two_density_clusters_with_outliers(n_normal=2000, contamination=0.05, random_state=42)
+
+    "HCY-Egy": {
+        "path": DATA_DIR / "HCV-Egy" / "HCV-Egy-Data.csv",
+        "read_csv": {"header": 0},
+        "drop_cols": [],
+        "label_col": -1,
+        "anomaly": [4],
+        "normalize": True,
     },
-    "syn_moons": {
-        "generator": lambda: synth_moons_with_outliers(n_normal=2000, contamination=0.05, random_state=42)
+
+    "messidor features": {
+        "path": DATA_DIR / "Messidor_features" / "messidor_features.csv",
+        "read_csv": {"header": None},
+        "drop_cols": [],
+        "label_col": -1,
+        "anomaly": [1],
+        "normalize": False,
     },
+
+    "ThoraricSurgery": {
+        "path": DATA_DIR / "ThoraricSurgery" / "ThoraricSurgery.csv",
+        "read_csv": {"header": 0},
+        "drop_cols": [0],
+        "label_col": -1,
+        "anomaly": ["T"],
+        "normalize": False,
+    },
+
+    "Cervical Cancer": {
+        "path": DATA_DIR / "Cervical Cancer" / "risk_factors_cervical_cancer.csv",
+        "read_csv": {"header": 0},
+        "drop_cols": [],
+        "label_col": -1,
+        "anomaly": [1],
+        "normalize": False,
+    },
+
+    "Cardiotocography": {
+        "path": DATA_DIR / "CTG" / "CTG.csv",
+        "read_csv": {"header": 0},
+        "drop_cols": [],
+        "label_col": -1,
+        "anomaly": [3],
+        "normalize": False,
+    },
+
+    # #合成数据集
+    # "syn_gauss_uo": {
+    #     "generator": lambda: synth_gaussian_with_uniform_outliers(n_normal=2000, contamination=0.05, random_state=42)
+    # },
+    # "syn_two_density": {
+    #     "generator": lambda: synth_two_density_clusters_with_outliers(n_normal=2000, contamination=0.05, random_state=42)
+    # },
+    # "syn_moons": {
+    #     "generator": lambda: synth_moons_with_outliers(n_normal=2000, contamination=0.05, random_state=42)
+    # },
 }
 
 def load_dataset(name: str):

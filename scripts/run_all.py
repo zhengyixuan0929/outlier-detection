@@ -6,12 +6,11 @@ import pandas as pd
 from sklearn.metrics import roc_auc_score
 
 from src.datasets import load_dataset, DATASETS
-from src.baselines import knn_distance_score, lof_score, iforest_score
+from src.baselines import knn_distance_score, lof_score  # ✅ 移除 iforest_score
 from src.hdiod import hdiod_score
 
 # =============== config you can tune ===============
-K_LIST = [10, 20, 50]
-IF_FIXED_TREES = 200
+K_LIST = [30, 50, 70]
 # ====================================================
 
 
@@ -46,19 +45,16 @@ def run_one_dataset(name: str) -> pd.DataFrame:
         s = hdiod_score(X, k=k)
         rows.append({"dataset": name, "method": "HDIOD", "param": f"k={k}", "k": k, "auc": safe_auc(y, s)})
 
-    # IForest（固定 trees，方便跟 k 排行榜一起比较）
-    s = iforest_score(X, n_estimators=IF_FIXED_TREES, random_state=42)
-    rows.append({"dataset": name, "method": "IForest", "param": f"trees={IF_FIXED_TREES}", "k": np.nan, "auc": safe_auc(y, s)})
-
     df = pd.DataFrame(rows)
     df["auc"] = df["auc"].astype(float)
     return df
 
 
 def leaderboard_fixed_k(df_one_dataset: pd.DataFrame, k: int) -> pd.DataFrame:
-    part = df_one_dataset[(df_one_dataset["k"] == k) & (df_one_dataset["method"].isin(["KNN", "LOF", "HDIOD"]))].copy()
-    iforest = df_one_dataset[df_one_dataset["method"] == "IForest"].copy()
-    lb = pd.concat([part, iforest], ignore_index=True)
+    lb = df_one_dataset[
+        (df_one_dataset["k"] == k) &
+        (df_one_dataset["method"].isin(["KNN", "LOF", "HDIOD"]))
+    ].copy()
 
     lb = lb.sort_values("auc", ascending=False).reset_index(drop=True)
     lb.insert(0, "rank", np.arange(1, len(lb) + 1))
@@ -112,10 +108,8 @@ def main():
     overall_rows = []
     for k in K_LIST:
         part = all_df[(all_df["k"] == k) & (all_df["method"].isin(["KNN", "LOF", "HDIOD"]))].copy()
-        iforest = all_df[all_df["method"] == "IForest"].copy()  # 固定trees
-        comb = pd.concat([part, iforest], ignore_index=True)
 
-        g = comb.groupby("method", as_index=False)["auc"].mean()
+        g = part.groupby("method", as_index=False)["auc"].mean()
         g["k"] = k
         overall_rows.append(g)
 
