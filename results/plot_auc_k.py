@@ -6,7 +6,10 @@ from sklearn.metrics import roc_auc_score
 from src.datasets import load_dataset, DATASETS
 from src.baselines import knn_distance_score, lof_score
 from src.hdiod import hdiod_score
+from pathlib import Path
 
+RESULTS_DIR = Path("results")
+RESULTS_DIR.mkdir(exist_ok=True)
 
 # 你可以改成 range(5, 101, 5) 这种更密一点
 K_LIST = list(range(5, 101, 5))
@@ -65,7 +68,7 @@ def plot_grid(df, dataset_names, ncols=3, out_png="auc_vs_k_grid.png"):
         axes[j].axis("off")
 
     plt.tight_layout()
-    plt.savefig(out_png)
+    plt.savefig(out_png, dpi=300, bbox_inches="tight")
     print(f"Saved figure -> {out_png}")
 
 
@@ -75,11 +78,12 @@ def main():
     dataset_names = list(DATASETS.keys())
 
     df = compute_auc_table(dataset_names)
-    df.to_csv("auc_vs_k_results.csv", index=False)
-    print("Saved raw results -> auc_vs_k_results.csv")
+    csv_path = RESULTS_DIR / "auc_vs_k_results.csv"
+    png_path = RESULTS_DIR / "auc_vs_k_grid.png"
+    df.to_csv(csv_path, index=False)
+    print(f"Saved raw results -> {csv_path}")
 
-    plot_grid(df, dataset_names, ncols=3, out_png="auc_vs_k_grid.png")
-
+    plot_grid(df, dataset_names, ncols=3, out_png=str(png_path))
 
 if __name__ == "__main__":
     main()
