@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.metrics import roc_auc_score
 
 from src.datasets import load_dataset, DATASETS
-from src.baselines import knn_distance_score, lof_score  # ✅ 移除 iforest_score
+from src.baselines import knn_distance_score, lof_score
 from src.hdiod import hdiod_score
 
 # =============== config you can tune ===============
@@ -98,13 +98,7 @@ def main():
             lb = leaderboard_fixed_k(df, k=k)
             print(lb.to_string(index=False))
 
-    # 汇总保存
     all_df = pd.concat(all_results, ignore_index=True)
-
-    all_df_out = all_df.copy()
-    all_df_out["auc"] = all_df_out["auc"].map(lambda x: np.nan if pd.isna(x) else round(float(x), 6))
-    all_df_out.to_csv("results_run_all_full.csv", index=False)
-
     overall_rows = []
     for k in K_LIST:
         part = all_df[(all_df["k"] == k) & (all_df["method"].isin(["KNN", "LOF", "HDIOD"]))].copy()
@@ -126,12 +120,6 @@ def main():
         sub.insert(0, "rank", np.arange(1, len(sub) + 1))
         print(f"\n[Overall | fixed k = {k}]")
         print(sub[["rank", "method", "auc"]].to_string(index=False))
-
-    overall_df.to_csv("results_run_all_overall_leaderboard.csv", index=False)
-
-    print("\nSaved:")
-    print(" - results_run_all_full.csv")
-    print(" - results_run_all_overall_leaderboard.csv")
 
 
 if __name__ == "__main__":
