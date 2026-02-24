@@ -2,11 +2,8 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 from sklearn.preprocessing import MinMaxScaler
-from src.synthetic import (
-    synth_gaussian_with_uniform_outliers,
-    synth_two_density_clusters_with_outliers,
-    synth_moons_with_outliers
-)
+from src.synthetic import SYNTHETICS
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "Data"
@@ -102,24 +99,19 @@ DATASETS = {
         "anomaly": [3],
         "normalize": False,
     },
-
-    # #合成数据集
-    # "syn_gauss_uo": {
-    #     "generator": lambda: synth_gaussian_with_uniform_outliers(n_normal=2000, contamination=0.05, random_state=42)
-    # },
-    # "syn_two_density": {
-    #     "generator": lambda: synth_two_density_clusters_with_outliers(n_normal=2000, contamination=0.05, random_state=42)
-    # },
-    # "syn_moons": {
-    #     "generator": lambda: synth_moons_with_outliers(n_normal=2000, contamination=0.05, random_state=42)
-    # },
 }
+# add synthetic datasets into DATASETS for iteration
+for syn_name in SYNTHETICS.keys():
+    DATASETS[syn_name] = {"type": "synthetic"}
 
 def load_dataset(name: str):
     """
     Load dataset by config in DATASETS.
     Returns X (float ndarray) and y (0/1 ndarray).
     """
+    if name in SYNTHETICS:
+        return SYNTHETICS[name]()
+
     if name not in DATASETS:
         raise ValueError(f"Unknown dataset: {name}. Available: {list(DATASETS.keys())}")
 
