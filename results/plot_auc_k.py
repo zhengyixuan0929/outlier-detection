@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_auc_score
 from src.datasets import load_dataset, DATASETS
-from src.baselines import knn_distance_score, lof_score
+from src.baselines import knn_distance_score, lof_score, cof_score, ldof_score
 from src.hdiod import hdiod_score
 from pathlib import Path
 
@@ -17,6 +17,8 @@ K_LIST = list(range(5, 101, 5))
 METHODS = {
     "KNN": knn_distance_score,
     "LOF": lof_score,
+    "COF": cof_score,
+    "LDOF": ldof_score,
     "HDIOD": hdiod_score,
 }
 
