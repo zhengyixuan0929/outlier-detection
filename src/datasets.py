@@ -10,13 +10,13 @@ DATA_DIR = BASE_DIR / "Data"
 
 DATASETS = {
     #真实数据集
-    "wdbc": {
+    "Breast Cancer": {
         "path": DATA_DIR / "breast+cancer+wisconsin+diagnostic" / "wdbc.csv",
         "read_csv": {"header": None,"skiprows": 1},
         "drop_cols": [0],  # 哪些列不能当作特征
         "label_col": 0,  # 那些列表示类别
         "anomaly": ["M"], #异常的值是什么
-        "normalize": False, #是否跳过归一化
+        "normalize": True, #是否进行归一化处理
     },
 
     "heart_failure": {
@@ -28,13 +28,13 @@ DATASETS = {
         "normalize": True,
     },
 
-    "bupa": {
+    "liver disorders": {
         "path": DATA_DIR / "liver+disorders" / "bupa.csv",
         "read_csv": {"header": None,"skiprows": 1},
         "drop_cols": [],
         "label_col": -1,
         "anomaly": [1],
-        "normalize": False,
+        "normalize": True,
     },
 
     "Parkinsons": {
@@ -55,7 +55,7 @@ DATASETS = {
         "normalize": True,
     },
 
-    "HCY-Egy": {
+    "Hepatitis C Virus (HCV) for Egyptian patients": {
         "path": DATA_DIR / "HCV-Egy" / "HCV-Egy-Data.csv",
         "read_csv": {"header": 0},
         "drop_cols": [],
@@ -64,22 +64,22 @@ DATASETS = {
         "normalize": True,
     },
 
-    "messidor features": {
+    "Diabetic Retinopathy Debrecen": {
         "path": DATA_DIR / "Messidor_features" / "messidor_features.csv",
         "read_csv": {"header": None},
         "drop_cols": [],
         "label_col": -1,
         "anomaly": [1],
-        "normalize": False,
+        "normalize": True,
     },
 
-    "ThoraricSurgery": {
+    "Thoracic Surgery": {
         "path": DATA_DIR / "ThoraricSurgery" / "ThoraricSurgery.csv",
         "read_csv": {"header": 0},
         "drop_cols": [0],
         "label_col": -1,
         "anomaly": ["T"],
-        "normalize": False,
+        "normalize": True,
     },
 
     "Cervical Cancer": {
@@ -88,7 +88,7 @@ DATASETS = {
         "drop_cols": [],
         "label_col": -1,
         "anomaly": [1],
-        "normalize": False,
+        "normalize": True,
     },
 
     "Cardiotocography": {
@@ -97,7 +97,7 @@ DATASETS = {
         "drop_cols": [],
         "label_col": -1,
         "anomaly": [3],
-        "normalize": False,
+        "normalize": True,
     },
 }
 # add synthetic datasets into DATASETS for iteration
