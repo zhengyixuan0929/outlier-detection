@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import roc_auc_score
 from src.datasets import load_dataset, DATASETS
 from src.baselines import knn_distance_score, lof_score, cof_score, ldof_score
-from src.hdiod import hdiod_score
+from src.hdiod import hdiod_score_paper
 from pathlib import Path
 
 RESULTS_DIR = Path("results")
@@ -19,7 +19,7 @@ METHODS = {
     "LOF": lof_score,
     "COF": cof_score,
     "LDOF": ldof_score,
-    "HDIOD": hdiod_score,
+    "HDIOD": hdiod_score_paper,
 }
 
 

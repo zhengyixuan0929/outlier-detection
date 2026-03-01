@@ -1,22 +1,13 @@
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 
-
+#计算局部核密度
 def local_kernel_density_paper(distances: np.ndarray) -> np.ndarray:
-    """
-    Paper Eq.(3):
-      rho(x_i) = (1/k) * sum exp(- d(x_i,x_j)^2 / 2)
-
-    distances shape: (n, k) where k excludes self
-    """
     return np.exp(-(distances ** 2) / 2.0).mean(axis=1)
 
 
 def hdiod_score_paper(X: np.ndarray, k: int = 10) -> np.ndarray:
-    """
-    HDIOD score aligned to paper.
-    Assumes X has already been normalized to [0,1] in datasets.py.
-    """
+
     X = np.asarray(X, dtype=float)
 
     n = X.shape[0]
