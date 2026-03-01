@@ -1,5 +1,5 @@
 from src.datasets import load_dataset, DATASETS
-from src.hdiod import hdiod_score
+from src.hdiod import hdiod_score_paper
 from sklearn.metrics import roc_auc_score
 
 def main():
@@ -13,7 +13,7 @@ def main():
         X, y = load_dataset(name)
 
         for k in ks:
-            scores = hdiod_score(X, k=k)
+            scores = hdiod_score_paper(X, k=k)
             auc = roc_auc_score(y, scores)
             print(f"  k={k:3d}  AUC={auc:.4f}")
 

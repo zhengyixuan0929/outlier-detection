@@ -5,12 +5,13 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import roc_auc_score
 from src.datasets import load_dataset, DATASETS
-from src.hdiod import hdiod_score
+from src.hdiod import hdiod_score_paper
 from src.baselines import knn_distance_score, lof_score, cof_score, ldof_score, hbos_score
 
 # =============== config you can tune ===============
-K_LIST = [30, 50, 70]
-IFOREST_TREES = [100, 200]  # 你之前用的 100/200
+K_LIST = [20, 60, 100]
+# K_LIST = list(range(5, 101, 5))
+# IFOREST_TREES = [100, 200]
 RESULTS_DIR = "results"
 OUT_ALL = os.path.join(RESULTS_DIR, "run_all_results.csv")
 OUT_OVERALL = os.path.join(RESULTS_DIR, "run_all_overall_leaderboard.csv")
@@ -80,7 +81,7 @@ def run_one_dataset(name: str) -> pd.DataFrame:
     for k in K_LIST:
         if k < 2:
             continue
-        s = hdiod_score(X, k=k)
+        s = hdiod_score_paper(X, k=k)
         add_row(rows, name, "HDIOD", f"k={k}", k, safe_auc(y, s))
 
     df = pd.DataFrame(rows)
