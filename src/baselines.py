@@ -11,7 +11,7 @@ def knn_distance_score(X, k=10):
     return distances[:, -1]  # 第k个邻居距离（越大越异常）
 
 def lof_score(X, k=20):
-    lof = LocalOutlierFactor(n_neighbors=k, novelty=False)  # unsupervised fit_predict 模式
+    lof = LocalOutlierFactor(n_neighbors=k, novelty=False)
     lof.fit_predict(X)  # 必须调用一次才会生成 negative_outlier_factor_
     # LOF anomaly score 返回值越大表示越异，所以 sklearn 的 negative_outlier_factor_ 取反
     scores = -lof.negative_outlier_factor_

@@ -8,12 +8,10 @@ import matplotlib.pyplot as plt
 def main():
     # ===== paths =====
     script_path = Path(__file__).resolve()
-    project_root = script_path.parents[1]           # <project>/
-    out_dir = script_path.parent / "results"        # <project>/results/results/
+    project_root = script_path.parents[1]
+    out_dir = script_path.parent / "results"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # input: default to your uploaded CSV location in project
-    # adjust here if you put it elsewhere
     in_csv_candidates = [
         project_root / "scripts" / "results" / "run_all_results_k_5_100_step5.csv",
     ]
@@ -30,7 +28,6 @@ def main():
     print(f"[OK] Input : {in_csv}")
     print(f"[OK] Output: {out_dir}")
 
-    # ===== load =====
     df = pd.read_csv(in_csv)
 
     required = {"dataset", "method", "k", "auc"}
@@ -38,30 +35,24 @@ def main():
     if missing:
         raise ValueError(f"CSV missing required columns: {missing}. Found columns: {list(df.columns)}")
 
-    # ===== filter synthetic only =====
-    # your synthetic dataset names are like: syn_moons, syn_spiral, ...
     df["dataset"] = df["dataset"].astype(str)
     synth = df[df["dataset"].str.lower().str.startswith("syn_")].copy()
 
     if synth.empty:
         raise ValueError("No synthetic datasets found (expect dataset name starts with 'syn_').")
 
-    # only k-based methods (exclude HBOS which has no k)
     synth = synth[synth["k"].notna()].copy()
     synth["k"] = synth["k"].astype(int)
     synth["auc"] = synth["auc"].astype(float)
 
-    # ===== compute mean AUC across synthetic datasets for each (method, k) =====
     g = synth.groupby(["method", "k"], as_index=False)["auc"].mean()
     g = g.rename(columns={"auc": "mean_auc_over_synth"}).sort_values(["method", "k"])
 
-    # save table used for plotting
     out_table = out_dir / "synthetic_mean_auc_by_k.csv"
     g.to_csv(out_table, index=False)
     print(f"[OK] Saved table: {out_table}")
 
-    # ===== boxplot over k for each method =====
-    methods_order = ["LOF", "COF", "KNN", "LDOF", "HDIOD"]  # paper-like order
+    methods_order = ["LOF", "COF", "KNN", "LDOF", "HDIOD"]
     methods = [m for m in methods_order if m in g["method"].unique()] + \
               [m for m in sorted(g["method"].unique()) if m not in methods_order]
 

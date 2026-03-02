@@ -11,7 +11,6 @@ from pathlib import Path
 RESULTS_DIR = Path("results")
 RESULTS_DIR.mkdir(exist_ok=True)
 
-# 你可以改成 range(5, 101, 5) 这种更密一点
 K_LIST = list(range(5, 101, 5))
 
 METHODS = {
@@ -36,7 +35,6 @@ def compute_auc_table(dataset_names):
         X, y = load_dataset(ds)
         for k in K_LIST:
             for mname, fn in METHODS.items():
-                # LOF 要求 k>=2（你这里最小是5没问题）
                 scores = fn(X, k=k)
                 auc = safe_auc(y, scores)
                 rows.append({"dataset": ds, "method": mname, "k": k, "auc": auc})
@@ -65,7 +63,6 @@ def plot_grid(df, dataset_names, ncols=3, out_png="auc_vs_k_grid.png"):
         ax.grid(True, linestyle="--", alpha=0.3)
         ax.legend(fontsize=8)
 
-    # 多余空子图关掉
     for j in range(i+1, len(axes)):
         axes[j].axis("off")
 

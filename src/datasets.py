@@ -100,15 +100,11 @@ DATASETS = {
         "normalize": True,
     },
 }
-# add synthetic datasets into DATASETS for iteration
+# 将合成数据集添加到DATASETS
 for syn_name in SYNTHETICS.keys():
     DATASETS[syn_name] = {"type": "synthetic"}
 
 def load_dataset(name: str):
-    """
-    Load dataset by config in DATASETS.
-    Returns X (float ndarray) and y (0/1 ndarray).
-    """
     if name in SYNTHETICS:
         return SYNTHETICS[name]()
 
@@ -124,29 +120,28 @@ def load_dataset(name: str):
         return X, y
 
     path = cfg["path"]
-    # 1) read
+    # 读取文件
     read_kwargs = cfg.get("read_csv", {})
     df = pd.read_csv(path, **read_kwargs)
 
-    # 2) drop useless cols (e.g., id / name)
+    # 删除无用列
     drop_cols = cfg.get("drop_cols", [])
     if drop_cols:
         df = df.drop(df.columns[drop_cols], axis=1)
 
-    # 3) build y from label column
+    # 根据标签列构建 y
     label_col = cfg["label_col"]
     label = df.iloc[:, label_col]
     anomaly_values = cfg["anomaly"]
     y = label.isin(anomaly_values).astype(int).to_numpy()
 
-    # 4) build X = all remaining numeric features
+    # 构建 X = 所有其余的数值特征
     X_df = df.drop(df.columns[label_col], axis=1)
     # 自动处理类别变量
     X_df = pd.get_dummies(X_df, drop_first=True)
-    # 强制数值化：如果还有字符串，会变成 NaN（便于定位）
+    # 强制数值化：如果还有字符串，就会变成 NaN
     X_df = X_df.apply(pd.to_numeric, errors="coerce")
 
-    # 如果你想严格：发现 NaN 就报错（推荐，早点发现脏数据）
     if X_df.isna().any().any():
         bad_cols = X_df.columns[X_df.isna().any()].tolist()
         raise ValueError(
@@ -156,7 +151,7 @@ def load_dataset(name: str):
     #把 pandas DataFrame 转成 numpy 数组
     X = X_df.to_numpy(dtype=float)
 
-    #采用0，1范围的数据归一化
+    #数据归一化
     if cfg.get("normalize", False):
         X = MinMaxScaler().fit_transform(X)
 
