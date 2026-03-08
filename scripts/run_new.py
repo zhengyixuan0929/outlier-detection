@@ -9,14 +9,23 @@ from sklearn.metrics import roc_auc_score
 from src.datasets import load_dataset, DATASETS
 from src.baselines import lof_score, cof_score, ldof_score
 from src.hdiod import hdiod_score_paper
-from src.new_hdiod import new_hdiod_score, knn_distance_score_fixed
-
+from src.new_hdiod import (
+    knn_distance_score_fixed,
+    gated_hdiod_score,
+    adaptive_gated_hdiod_score,
+)
 
 warnings.filterwarnings("ignore")
 
-# 你可以自己改
 K_LIST = list(range(5, 101, 5))
-ALPHA = 0.5
+
+GATED_LAM = 0.6
+GATED_GAMMA = 2.0
+
+ADAPT_LAM_SMALL = 0.9
+ADAPT_LAM_LARGE = 0.25
+ADAPT_K_SWITCH = 30
+ADAPT_GAMMA = 2.0
 
 RESULTS_DIR = "results"
 OUT_ALL = os.path.join(RESULTS_DIR, "run_new_results.csv")
@@ -50,45 +59,59 @@ def run_one_dataset(name: str) -> pd.DataFrame:
     X, y = load_dataset(name)
     rows: List[Dict] = []
 
-    # ---------- KNN ----------
     for k in K_LIST:
         s = knn_distance_score_fixed(X, k=k)
         add_row(rows, name, "KNN", f"k={k}", k, safe_auc(y, s))
 
-    # ---------- LOF ----------
     for k in K_LIST:
         if k < 2:
             continue
         s = lof_score(X, k=k)
         add_row(rows, name, "LOF", f"k={k}", k, safe_auc(y, s))
 
-    # ---------- COF ----------
     for k in K_LIST:
         if k < 2:
             continue
         s = cof_score(X, k=k)
         add_row(rows, name, "COF", f"k={k}", k, safe_auc(y, s))
 
-    # ---------- LDOF ----------
     for k in K_LIST:
         if k < 2:
             continue
         s = ldof_score(X, k=k)
         add_row(rows, name, "LDOF", f"k={k}", k, safe_auc(y, s))
 
-    # ---------- HDIOD ----------
     for k in K_LIST:
         if k < 2:
             continue
         s = hdiod_score_paper(X, k=k)
         add_row(rows, name, "HDIOD", f"k={k}", k, safe_auc(y, s))
 
-    # ---------- NEW_HDIOD ----------
     for k in K_LIST:
         if k < 2:
             continue
-        s = new_hdiod_score(X, k=k, alpha=ALPHA)
-        add_row(rows, name, "NEW_HDIOD", f"k={k},alpha={ALPHA}", k, safe_auc(y, s))
+        s = gated_hdiod_score(X, k=k, lam=GATED_LAM, gamma=GATED_GAMMA)
+        add_row(rows, name, "GATED_HDIOD", f"k={k},lam={GATED_LAM},gamma={GATED_GAMMA}", k, safe_auc(y, s))
+
+    for k in K_LIST:
+        if k < 2:
+            continue
+        s = adaptive_gated_hdiod_score(
+            X,
+            k=k,
+            lam_small=ADAPT_LAM_SMALL,
+            lam_large=ADAPT_LAM_LARGE,
+            k_switch=ADAPT_K_SWITCH,
+            gamma=ADAPT_GAMMA,
+        )
+        add_row(
+            rows,
+            name,
+            "ADAPT_GATED_HDIOD",
+            f"k={k},lam_small={ADAPT_LAM_SMALL},lam_large={ADAPT_LAM_LARGE},k_switch={ADAPT_K_SWITCH},gamma={ADAPT_GAMMA}",
+            k,
+            safe_auc(y, s),
+        )
 
     df = pd.DataFrame(rows)
     df["auc"] = df["auc"].astype(float)
@@ -111,9 +134,9 @@ def print_overall_leaderboard(df_all: pd.DataFrame):
         sub = sub.sort_values("auc", ascending=False).reset_index(drop=True)
 
         print(f"\n[Overall | fixed k = {int(k)}]")
-        print(f"{'rank':<5}{'method':<12}{'auc':<10}")
+        print(f"{'rank':<5}{'method':<20}{'auc':<10}")
         for i, row in sub.iterrows():
-            print(f"{i+1:<5}{row['method']:<12}{row['auc']:.4f}")
+            print(f"{i+1:<5}{row['method']:<20}{row['auc']:.4f}")
 
 
 def make_overall_csv(df_all: pd.DataFrame) -> pd.DataFrame:
