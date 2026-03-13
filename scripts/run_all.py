@@ -4,19 +4,25 @@ from typing import List, Dict
 import numpy as np
 import pandas as pd
 from sklearn.metrics import roc_auc_score
+
 from src.datasets import load_dataset, DATASETS
 from src.hdiod import hdiod_score_paper
 from src.baselines import knn_distance_score, lof_score, cof_score, ldof_score, hbos_score
+from src.new_hdiod import gated_hdiod_score   # 新增
 
 # =============== config you can tune ===============
 K_LIST = [20, 60, 100]
 # K_LIST = list(range(5, 101, 5))
-# IFOREST_TREES = [100, 200]
+
 RESULTS_DIR = "results"
 OUT_ALL = os.path.join(RESULTS_DIR, "run_all_results.csv")
 OUT_OVERALL = os.path.join(RESULTS_DIR, "run_all_overall_leaderboard.csv")
 OUT_PER_DATASET_LB = os.path.join(RESULTS_DIR, "run_all_per_dataset_leaderboards.csv")
-# ====================================================
+
+# ---- GATED_HDIOD params ----
+GATED_LAM = 0.6
+GATED_GAMMA = 2.0
+# ================================================
 
 
 def ensure_results_dir():
@@ -84,6 +90,20 @@ def run_one_dataset(name: str) -> pd.DataFrame:
         s = hdiod_score_paper(X, k=k)
         add_row(rows, name, "HDIOD", f"k={k}", k, safe_auc(y, s))
 
+    # ---------- GATED_HDIOD ----------
+    for k in K_LIST:
+        if k < 2:
+            continue
+        s = gated_hdiod_score(X, k=k, lam=GATED_LAM, gamma=GATED_GAMMA)
+        add_row(
+            rows,
+            name,
+            "GATED_HDIOD",
+            f"k={k},lam={GATED_LAM},gamma={GATED_GAMMA}",
+            k,
+            safe_auc(y, s),
+        )
+
     df = pd.DataFrame(rows)
     df["auc"] = df["auc"].astype(float)
     return df
@@ -92,14 +112,13 @@ def run_one_dataset(name: str) -> pd.DataFrame:
 def print_all_results_table(df_one: pd.DataFrame):
     show = df_one.copy()
     show["auc"] = show["auc"].map(lambda x: np.nan if pd.isna(x) else round(float(x), 4))
-    # 让输出更像“先方法，再参数”
     show = show.sort_values(["method", "k", "param"], na_position="last")
     print(show[["method", "param", "auc"]].to_string(index=False))
 
 
 def leaderboard_fixed_k(df_one: pd.DataFrame, k: int) -> pd.DataFrame:
     """Leaderboard for methods that share k."""
-    methods_with_k = ["KNN", "LOF", "COF", "LDOF", "HDIOD"]
+    methods_with_k = ["KNN", "LOF", "COF", "LDOF", "HDIOD", "GATED_HDIOD"]
 
     lb = df_one[(df_one["k"] == k) & (df_one["method"].isin(methods_with_k))].copy()
     lb = lb.sort_values("auc", ascending=False).reset_index(drop=True)
@@ -125,7 +144,7 @@ def overall_leaderboard(all_df: pd.DataFrame) -> pd.DataFrame:
     rows = []
 
     # k-based methods
-    methods_with_k = ["KNN", "LOF", "COF", "LDOF", "HDIOD"]
+    methods_with_k = ["KNN", "LOF", "COF", "LDOF", "HDIOD", "GATED_HDIOD"]
     for k in K_LIST:
         part = all_df[(all_df["k"] == k) & (all_df["method"].isin(methods_with_k))].copy()
         g = part.groupby("method", as_index=False)["auc"].mean()
@@ -146,7 +165,6 @@ def overall_leaderboard(all_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def main():
-    # silence warnings (sklearn AUC undefined, LOF duplicates, etc.)
     warnings.filterwarnings("ignore")
 
     ensure_results_dir()
@@ -178,7 +196,6 @@ def main():
             lb = leaderboard_fixed_k(df, k=k)
             print(lb.to_string(index=False))
 
-            # store for csv
             tmp = lb.copy()
             tmp.insert(0, "dataset", name)
             tmp.insert(2, "k", k)

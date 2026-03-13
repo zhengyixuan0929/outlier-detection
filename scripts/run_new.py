@@ -12,7 +12,6 @@ from src.hdiod import hdiod_score_paper
 from src.new_hdiod import (
     knn_distance_score_fixed,
     gated_hdiod_score,
-    adaptive_gated_hdiod_score,
 )
 
 warnings.filterwarnings("ignore")
@@ -21,11 +20,6 @@ K_LIST = list(range(5, 101, 5))
 
 GATED_LAM = 0.6
 GATED_GAMMA = 2.0
-
-ADAPT_LAM_SMALL = 0.9
-ADAPT_LAM_LARGE = 0.25
-ADAPT_K_SWITCH = 30
-ADAPT_GAMMA = 2.0
 
 RESULTS_DIR = "results"
 OUT_ALL = os.path.join(RESULTS_DIR, "run_new_results.csv")
@@ -93,25 +87,6 @@ def run_one_dataset(name: str) -> pd.DataFrame:
         s = gated_hdiod_score(X, k=k, lam=GATED_LAM, gamma=GATED_GAMMA)
         add_row(rows, name, "GATED_HDIOD", f"k={k},lam={GATED_LAM},gamma={GATED_GAMMA}", k, safe_auc(y, s))
 
-    for k in K_LIST:
-        if k < 2:
-            continue
-        s = adaptive_gated_hdiod_score(
-            X,
-            k=k,
-            lam_small=ADAPT_LAM_SMALL,
-            lam_large=ADAPT_LAM_LARGE,
-            k_switch=ADAPT_K_SWITCH,
-            gamma=ADAPT_GAMMA,
-        )
-        add_row(
-            rows,
-            name,
-            "ADAPT_GATED_HDIOD",
-            f"k={k},lam_small={ADAPT_LAM_SMALL},lam_large={ADAPT_LAM_LARGE},k_switch={ADAPT_K_SWITCH},gamma={ADAPT_GAMMA}",
-            k,
-            safe_auc(y, s),
-        )
 
     df = pd.DataFrame(rows)
     df["auc"] = df["auc"].astype(float)

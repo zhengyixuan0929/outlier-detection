@@ -132,21 +132,3 @@ def gated_hdiod_score(
     score = hdiod * (1.0 + lam * gate)
     return score
 
-
-def adaptive_gated_hdiod_score(
-    X: np.ndarray,
-    k: int = 10,
-    lam_small: float = 0.9,
-    lam_large: float = 0.25,
-    k_switch: int = 30,
-    gamma: float = 2.0,
-) -> np.ndarray:
-    """
-    Adaptive Gated HDIOD:
-    stronger distance enhancement for small k, weaker for large k.
-
-    If k <= k_switch -> use lam_small
-    else -> use lam_large
-    """
-    lam = lam_small if k <= k_switch else lam_large
-    return gated_hdiod_score(X, k=k, lam=lam, gamma=gamma)
