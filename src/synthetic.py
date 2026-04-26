@@ -14,9 +14,7 @@ def _inject_uniform_outliers(Xn, n_out, low=-10, high=10, random_state=42):
     return X, y
 
 
-# -----------------------------
-# S01: single Gaussian + uniform outliers (类似 DS01)
-# -----------------------------
+# S01: single Gaussian + uniform outliers
 def syn_gauss_uo(n_normal=1000, contamination=0.05, random_state=42):
     n_out = int(n_normal * contamination)
     Xn, _ = make_blobs(
@@ -28,9 +26,7 @@ def syn_gauss_uo(n_normal=1000, contamination=0.05, random_state=42):
     return _inject_uniform_outliers(Xn, n_out, low=-8, high=8, random_state=random_state)
 
 
-# -----------------------------
-# S02: multi Gaussian blobs + uniform outliers (类似 DS02)
-# -----------------------------
+# S02: multi Gaussian blobs + uniform outliers
 def syn_multi_blobs_uo(n_normal=1999, contamination=0.08, random_state=42):
     n_out = int(n_normal * contamination)
     Xn, _ = make_blobs(
@@ -42,9 +38,7 @@ def syn_multi_blobs_uo(n_normal=1999, contamination=0.08, random_state=42):
     return _inject_uniform_outliers(Xn, n_out, low=-10, high=10, random_state=random_state)
 
 
-# -----------------------------
-# S03: two density clusters + uniform outliers (类似 DS03/DS04 的密度差)
-# -----------------------------
+# S03: two density clusters + uniform outliers
 def syn_two_density(n_normal=2026, contamination=0.06, random_state=42):
     rng = _rng(random_state)
     n_out = int(n_normal * contamination)
@@ -61,10 +55,7 @@ def syn_two_density(n_normal=2026, contamination=0.06, random_state=42):
     y = np.hstack([np.zeros(len(Xn), dtype=int), np.ones(n_out, dtype=int)])
     return X, y
 
-
-# -----------------------------
-# S04: block / checkerboard normal + scattered outliers (类似 DS03/DS04 方块结构)
-# -----------------------------
+# S04: block / checkerboard normal + scattered outliers
 def syn_blocks(n_normal=1689, contamination=0.05, random_state=42):
     rng = _rng(random_state)
     n_out = int(n_normal * contamination)
@@ -87,9 +78,7 @@ def syn_blocks(n_normal=1689, contamination=0.05, random_state=42):
     return X, y
 
 
-# -----------------------------
-# S05: V-shape curve + outliers (类似 DS05 折线结构)
-# -----------------------------
+# S05: V-shape curve + outliers
 def syn_vshape(n_normal=3975, contamination=0.08, noise=0.08, random_state=42):
     rng = _rng(random_state)
     n_out = int(n_normal * contamination)
@@ -104,10 +93,7 @@ def syn_vshape(n_normal=3975, contamination=0.08, noise=0.08, random_state=42):
     y = np.hstack([np.zeros(len(Xn), dtype=int), np.ones(n_out, dtype=int)])
     return X, y
 
-
-# -----------------------------
-# S06: moons + outliers (类似 DS06 半月)
-# -----------------------------
+# S06: moons + outliers
 def syn_moons(n_normal=873, contamination=0.06, noise=0.08, random_state=42):
     rng = _rng(random_state)
     n_out = int(n_normal * contamination)
@@ -122,9 +108,7 @@ def syn_moons(n_normal=873, contamination=0.06, noise=0.08, random_state=42):
     return X, y
 
 
-# -----------------------------
-# S07: spiral + outliers (类似 DS07 螺旋)
-# -----------------------------
+# S07: spiral + outliers
 def syn_spiral(n_normal=1458, contamination=0.06, noise=0.15, random_state=42):
     rng = _rng(random_state)
     n_out = int(n_normal * contamination)
@@ -141,10 +125,7 @@ def syn_spiral(n_normal=1458, contamination=0.06, noise=0.15, random_state=42):
     y = np.hstack([np.zeros(len(Xn), dtype=int), np.ones(n_out, dtype=int)])
     return X, y
 
-
-# -----------------------------
-# S08: double spiral + outliers (类似 DS08 双螺旋)
-# -----------------------------
+# S08: double spiral + outliers
 def syn_double_spiral(n_normal=2894, contamination=0.06, noise=0.18, random_state=42):
     rng = _rng(random_state)
     n_out = int(n_normal * contamination)
@@ -169,10 +150,7 @@ def syn_double_spiral(n_normal=2894, contamination=0.06, noise=0.18, random_stat
     y = np.hstack([np.zeros(len(Xn), dtype=int), np.ones(n_out, dtype=int)])
     return X, y
 
-
-# -----------------------------
-# S09: sine curve + outliers (类似 DS09)
-# -----------------------------
+# S09: sine curve + outliers
 def syn_sine(n_normal=1298, contamination=0.05, noise=0.10, random_state=42):
     rng = _rng(random_state)
     n_out = int(n_normal * contamination)
@@ -187,10 +165,7 @@ def syn_sine(n_normal=1298, contamination=0.05, noise=0.10, random_state=42):
     y = np.hstack([np.zeros(len(Xn), dtype=int), np.ones(n_out, dtype=int)])
     return X, y
 
-
-# -----------------------------
-# S10: two parallel lines + outliers (类似 DS11 斜线)
-# -----------------------------
+# S10: two parallel lines + outliers
 def syn_two_lines(n_normal=1234, contamination=0.06, noise=0.08, random_state=42):
     rng = _rng(random_state)
     n_out = int(n_normal * contamination)
@@ -211,9 +186,7 @@ def syn_two_lines(n_normal=1234, contamination=0.06, noise=0.08, random_state=42
     return X, y
 
 
-# -----------------------------
 # registry: 10 synthetic datasets
-# -----------------------------
 SYNTHETICS = {
     "syn_gauss_uo": syn_gauss_uo,
     "syn_multi_blobs_uo": syn_multi_blobs_uo,

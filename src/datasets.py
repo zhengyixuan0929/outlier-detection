@@ -13,10 +13,10 @@ DATASETS = {
     "Breast Cancer": {
         "path": DATA_DIR / "breast+cancer+wisconsin+diagnostic" / "wdbc.csv",
         "read_csv": {"header": None,"skiprows": 1},
-        "drop_cols": [0],  # 哪些列不能当作特征
-        "label_col": 0,  # 那些列表示类别
-        "anomaly": ["M"], #异常的值是什么
-        "normalize": True, #是否进行归一化处理
+        "drop_cols": [0],  # Which columns cannot be used as features
+        "label_col": 0,  # Those indicate categories
+        "anomaly": ["M"], # What is the abnormal value
+        "normalize": True, # Whether to perform normalization processing
     },
 
     "heart_failure": {
@@ -100,9 +100,9 @@ DATASETS = {
         "normalize": True,
     },
 }
-# 将合成数据集添加到DATASETS
-for syn_name in SYNTHETICS.keys():
-    DATASETS[syn_name] = {"type": "synthetic"}
+# Add the synthetic dataset to DATASETS
+# for syn_name in SYNTHETICS.keys():
+#     DATASETS[syn_name] = {"type": "synthetic"}
 
 def load_dataset(name: str):
     if name in SYNTHETICS:
@@ -120,26 +120,22 @@ def load_dataset(name: str):
         return X, y
 
     path = cfg["path"]
-    # 读取文件
+
     read_kwargs = cfg.get("read_csv", {})
     df = pd.read_csv(path, **read_kwargs)
 
-    # 删除无用列
+
     drop_cols = cfg.get("drop_cols", [])
     if drop_cols:
         df = df.drop(df.columns[drop_cols], axis=1)
 
-    # 根据标签列构建 y
     label_col = cfg["label_col"]
     label = df.iloc[:, label_col]
     anomaly_values = cfg["anomaly"]
     y = label.isin(anomaly_values).astype(int).to_numpy()
 
-    # 构建 X = 所有其余的数值特征
     X_df = df.drop(df.columns[label_col], axis=1)
-    # 自动处理类别变量
     X_df = pd.get_dummies(X_df, drop_first=True)
-    # 强制数值化：如果还有字符串，就会变成 NaN
     X_df = X_df.apply(pd.to_numeric, errors="coerce")
 
     if X_df.isna().any().any():
@@ -148,10 +144,9 @@ def load_dataset(name: str):
             f"{name}: Non-numeric or missing values found after conversion. "
             f"Columns with NaN: {bad_cols} (check drop_cols/label_col)."
         )
-    #把 pandas DataFrame 转成 numpy 数组
     X = X_df.to_numpy(dtype=float)
 
-    #数据归一化
+    # Data Normalization
     if cfg.get("normalize", False):
         X = MinMaxScaler().fit_transform(X)
 

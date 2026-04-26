@@ -100,10 +100,8 @@ def gated_hdiod_score(
     """
     Gated HDIOD:
         score = hdiod * (1 + lam * gate)
-
     gate is constructed from normalized kNN distance:
         gate = (norm_knn_distance) ** gamma
-
     Parameters
     ----------
     X : ndarray
@@ -114,7 +112,6 @@ def gated_hdiod_score(
         Enhancement strength. Typical values: 0.3 ~ 1.0
     gamma : float
         Gate sharpness. gamma > 1 makes enhancement focus more on large-distance points.
-
     Returns
     -------
     ndarray

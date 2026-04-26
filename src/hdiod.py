@@ -1,20 +1,19 @@
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 
-#计算局部核密度
-#对应论文 Eq.(3)
+# Calculate local kernel density
+# Corresponding to the paper Eq. (3)
 # ρ(x_i) = (1/k) * Σ exp( - d(x_i, x_j)^2 / 2 )
-# 省略了 (2π)^d 常数项，因为在 cof 比值中会相互抵消
+# The term (2π)^d constant is omitted because it will cancel out in the cof ratio
 def local_kernel_density_paper(distances: np.ndarray) -> np.ndarray:
     return np.exp(-(distances ** 2) / 2.0).mean(axis=1)
 
 
-# HDIOD 主函数
-# 实现论文中的
-# kNN 构建
-# 局部核密度计算
-# 高密度迭代 (High-Density Iteration)
-# 扩展邻域 EkNN
+# HDIOD Main Function
+# kNN construction
+# Local Kernel Density Calculation
+# High-Density Iteration (HDI)
+# Extended Neighborhood EkNN
 # centripetal outlier factor (cof)
 def hdiod_score_paper(X: np.ndarray, k: int = 10) -> np.ndarray:
 
@@ -40,9 +39,9 @@ def hdiod_score_paper(X: np.ndarray, k: int = 10) -> np.ndarray:
 
     peaks = np.empty(n, dtype=int)
 
-    # 如果当前点的密度小于其邻居中最大密度
-    # 则跳转到该最大密度邻居 重复该过程
-    # 直到达到局部密度最高点
+    # If the density of the current point is less than the maximum density among its neighbors,
+    # then move to the neighbor with the maximum density and repeat this process.
+    # Continue until the local density reaches its peak.
     for i in range(n):
         cur = i
         steps = 0
@@ -55,7 +54,7 @@ def hdiod_score_paper(X: np.ndarray, k: int = 10) -> np.ndarray:
             if steps > n:
                 break
 
-        # 沿着迭代路径，将路径上所有点的 kNN 合并
+        # Along the iterative path, merge the kNN of all points along the path
         traj = [i]
         cur2 = i
         steps2 = 0
@@ -68,12 +67,12 @@ def hdiod_score_paper(X: np.ndarray, k: int = 10) -> np.ndarray:
             steps2 += 1
             if steps2 > n:
                 break
-        # 合并路径上所有点的kNN
+        # KNN of all points on the merged path
         eknn = set()
         for t in traj:
             eknn.update(indices[t].tolist())
         eknn = np.fromiter(eknn, dtype=int)
         peaks[i] = eknn[np.argmax(rho[eknn])]
-    #计算cof 值越大样本就越远离高密度地区
+
     cof = rho[peaks] / (rho + 1e-12)
     return cof

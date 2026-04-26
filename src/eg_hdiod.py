@@ -125,13 +125,10 @@ def eg_hdiod_score(
 ) -> np.ndarray:
     """
     EG_HDIOD (Expanded Gated HDIOD):
-
         score = HDIOD_{k_exp} * (1 + lam * gate_k)
-
     where:
     - HDIOD uses an expanded neighborhood k_exp
     - gate still uses the original small k
-
     Parameters
     ----------
     X : ndarray
@@ -148,7 +145,6 @@ def eg_hdiod_score(
         Gate enhancement strength.
     gamma : float
         Gate sharpness.
-
     Returns
     -------
     ndarray
@@ -173,10 +169,8 @@ def eg_hdiod_score(
 
     # keep k_exp valid
     k_exp = min(max(k_exp, k + 1), n - 1)
-
     hdiod_expanded = hdiod_score_with_custom_k(X, k_density=k_exp)
     knn_dist_smallk = knn_distance_score_fixed(X, k=k)
-
     gate = _minmax_score(knn_dist_smallk) ** gamma
     score = hdiod_expanded * (1.0 + lam * gate)
     return score

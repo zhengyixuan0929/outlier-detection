@@ -6,6 +6,7 @@ from sklearn.metrics import roc_auc_score
 from src.datasets import load_dataset, DATASETS
 from src.baselines import knn_distance_score, lof_score, cof_score, ldof_score
 from src.hdiod import hdiod_score_paper
+from src.new_hdiod import gated_hdiod_score
 from pathlib import Path
 
 RESULTS_DIR = Path("results")
@@ -13,12 +14,18 @@ RESULTS_DIR.mkdir(exist_ok=True)
 
 K_LIST = list(range(5, 101, 5))
 
+GATED_LAM = 0.6
+GATED_GAMMA = 2.0
+
 METHODS = {
     "KNN": knn_distance_score,
     "LOF": lof_score,
     "COF": cof_score,
     "LDOF": ldof_score,
     "HDIOD": hdiod_score_paper,
+    "GATED_HDIOD": lambda X, k: gated_hdiod_score(
+        X, k=k, lam=GATED_LAM, gamma=GATED_GAMMA
+    ),
 }
 
 

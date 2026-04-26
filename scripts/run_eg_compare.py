@@ -28,8 +28,8 @@ GATED_GAMMA = 2.0
 # ----- EG_HDIOD params -----
 EG_LAM = 0.6
 EG_GAMMA = 2.0
-EG_K_EXPAND_MODE = "double"   # "double" or "plus"
-EG_EXPAND_OFFSET = 10         # used only when mode == "plus"
+EG_K_EXPAND_MODE = "double"
+EG_EXPAND_OFFSET = 10
 # ==========================================
 
 
