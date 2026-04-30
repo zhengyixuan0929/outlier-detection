@@ -23,16 +23,12 @@ def hdiod_score_paper(X: np.ndarray, k: int = 10) -> np.ndarray:
     if k <= 0 or k >= n:
         raise ValueError(f"k must be in [1, n-1]. Got k={k}, n={n}.")
 
-    # 构建 kNN 图
     nn = NearestNeighbors(n_neighbors=k + 1, metric="euclidean")
     nn.fit(X)
     distances, indices = nn.kneighbors(X, return_distance=True)
-    # 去掉自身 避免自身成为第一个邻居
     distances = distances[:, 1:]
     indices = indices[:, 1:]
-    # 局部核密度
     rho = local_kernel_density_paper(distances)
-    # 对于每个样本 找出其 KNN 中局部密度最大的邻居
     best_pos = np.argmax(rho[indices], axis=1)
     best_neighbor = indices[np.arange(n), best_pos]
     best_neighbor_rho = rho[best_neighbor]

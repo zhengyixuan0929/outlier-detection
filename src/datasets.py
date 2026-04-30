@@ -101,8 +101,8 @@ DATASETS = {
     },
 }
 # Add the synthetic dataset to DATASETS
-# for syn_name in SYNTHETICS.keys():
-#     DATASETS[syn_name] = {"type": "synthetic"}
+for syn_name in SYNTHETICS.keys():
+    DATASETS[syn_name] = {"type": "synthetic"}
 
 def load_dataset(name: str):
     if name in SYNTHETICS:
